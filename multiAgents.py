@@ -74,7 +74,48 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        distFromGhost = 0
+        nearGhost = "Not near"
+        res =  -(currentGameState.getScore()-successorGameState.getScore())
+        idx = 0
+        tmp = len(newFood.asList())
+
+        # Going through the ghost positions
+        for i in successorGameState.getGhostPositions():
+
+            # Checks if the ghost is near Pacman
+            if newScaredTimes[idx] == 0:
+              if manhattanDistance(i, newPos) < 3:
+                nearGhost = "Near"
+            idx += 1
+        
+        # If the action is "Stop", the penalty is stored in the result
+        if action == "Stop":
+            res -= 500
+        
+        # If the ghost is near, return the result
+        if nearGhost == "Near":
+            return res
+    
+        # Case for when the ghost is not near
+        else:
+          if tmp > 0:
+              distance, closestFood = min([(manhattanDistance(newPos, food), food) for food in newFood.asList()])
+              tmp2 = distance//0.5
+              if distance == 0:
+                  distFromGhost = tmp2
+                
+              else:
+                  distFromGhost = -tmp2
+          
+          # Add to the scoring function if the current food pellets is more than the successor
+          if currentGameState.getNumFood() > successorGameState.getNumFood():
+              res += 500
+          
+          # Adding distance from the ghost to the scoring value
+          res += distFromGhost
+
+        return res
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -170,4 +211,3 @@ def betterEvaluationFunction(currentGameState):
 
 # Abbreviation
 better = betterEvaluationFunction
-
