@@ -325,7 +325,78 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # Expectimax search function 
+        def expectimaxSearch(gameState, depth, nextAgent):
+            actionMax = ""
+            val = 0
+            agentLen = len(gameState.getLegalActions(nextAgent))
+            
+            # Looping through the actions of the next agent
+            for action in gameState.getLegalActions(nextAgent):
+                tmp = expectimax(gameState.generateSuccessor(nextAgent, action), depth, nextAgent + 1)
+                
+                # If the type of the expectimax function in a list, the maximum value is stored
+                if type(tmp) is list:
+                    newVal = tmp[1]
+                
+                # If it is not a list, only the number is search
+                else:
+                    newVal = tmp
+                    
+                actionMax = action
+
+                # Sum of the probabilities is stored in the value
+                val += newVal/agentLen
+            
+            # The list of the action and the value is stored
+            return [actionMax,val]
+
+        # Returns the maximum value and the actions of the agent 
+        def maximum(gameState, depth, nextAgent):     
+            actionMax = ""
+            val = 0
+
+            for action in gameState.getLegalActions(nextAgent):
+                tmp = expectimax(gameState.generateSuccessor(nextAgent, action), depth, nextAgent + 1)
+                if type(tmp) is not list:
+                    newVal = tmp
+                else:
+                    newVal = tmp[1]
+                if newVal > val:
+                    actionMax = action
+                    val = newVal
+            return [actionMax,val]
+
+        # The expectimax function that evaluates the agent 
+        def expectimax(gameState, dep, nextAgent):
+
+            # If all the agents have been explored
+            if nextAgent >= gameState.getNumAgents():
+                dep = dep + 1
+                nextAgent -= nextAgent
+            
+            # If the maximum depth of the tree has been traversed
+            if dep == self.depth:
+                return self.evaluationFunction(gameState)
+
+            # If the game has been won or lost
+            if gameState.isWin():
+                return self.evaluationFunction(gameState)
+
+            if gameState.isLose():
+                return self.evaluationFunction(gameState)
+            
+            # If there are no agents explored yet
+            elif (nextAgent == 0):
+                return maximum(gameState, dep,0)
+            
+            # Performing the expectimax search for agents with the maximum value
+            else:
+                return expectimaxSearch(gameState, dep, nextAgent)
+
+        # Actions of the expectimax agent 
+        return (expectimax(gameState, 0, 0))[0]
 
 def betterEvaluationFunction(currentGameState):
     """
