@@ -398,6 +398,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         # Actions of the expectimax agent 
         return (expectimax(gameState, 0, 0))[0]
 
+# Evaluation functions for the expectimax 
 def betterEvaluationFunction(currentGameState):
     """
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
@@ -406,7 +407,23 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # If there is no current state (defensive coding)
+    if not currentGameState.getFood().asList():
+        return scoreEvaluationFunction(currentGameState)
+    
+    # Initializing a variable that stores the smallest manhattan distance
+    minVal = float("inf")
+
+    # Finding out the smallest manhattan distance for the more optimal evaluation function
+    for food in currentGameState.getFood().asList():
+        if minVal > manhattanDistance(list(currentGameState.getPacmanPosition()), food):
+          minVal = manhattanDistance(list(currentGameState.getPacmanPosition()), food)
+
+    # The metric for evaluating the expectimax agent
+    res = scoreEvaluationFunction(currentGameState) - minVal//0.5
+    return res
+
 
 # Abbreviation
 better = betterEvaluationFunction
